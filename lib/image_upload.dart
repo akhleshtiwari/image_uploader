@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -106,11 +108,28 @@ class _ImageUploadState extends State<ImageUpload> {
                               },
                               child: Stack(
                                 children: [
-                                  InteractiveViewer(
-                                    child: Image.file(
-                                      _images[_currentIndex],
-                                      fit: BoxFit.contain,
-                                      width: MediaQuery.of(context).size.width,
+                                  PhotoViewGallery.builder(
+                                    onPageChanged: (index) {
+                                      setState(() {
+                                        _currentIndex = index;
+                                      });
+                                    },
+                                    scrollPhysics:
+                                        const BouncingScrollPhysics(),
+                                    pageController: PageController(
+                                        initialPage: _currentIndex),
+                                    backgroundDecoration: const BoxDecoration(
+                                        color: Colors.white),
+                                    itemCount: _images.length,
+                                    builder: (context, index) =>
+                                        PhotoViewGalleryPageOptions(
+                                      minScale:
+                                          PhotoViewComputedScale.contained,
+                                      maxScale:
+                                          PhotoViewComputedScale.covered * 2,
+                                      imageProvider: FileImage(
+                                        _images[_currentIndex],
+                                      ),
                                     ),
                                   ),
                                   Positioned(
